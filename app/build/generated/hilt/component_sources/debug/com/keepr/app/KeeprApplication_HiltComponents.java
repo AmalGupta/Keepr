@@ -1,7 +1,15 @@
 package com.keepr.app;
 
+import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
+import com.keepr.app.di.DatabaseModule;
 import com.keepr.app.di.NetworkModule;
+import com.keepr.app.di.RepositoryModule;
+import com.keepr.app.di.UtilModule;
+import com.keepr.app.di.WorkerModule;
+import com.keepr.app.ui.screens.add.AddEditApplianceViewModel_HiltModules;
+import com.keepr.app.ui.screens.detail.ApplianceDetailViewModel_HiltModules;
 import com.keepr.app.ui.screens.home.HomeViewModel_HiltModules;
+import com.keepr.app.worker.WarrantyNotificationWorker_HiltModule;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -127,10 +135,16 @@ public final class KeeprApplication_HiltComponents {
   @Component(
       modules = {
           ApplicationContextModule.class,
+          DatabaseModule.class,
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
+          HiltWrapper_WorkerFactoryModule.class,
           ActivityRetainedCBuilderModule.class,
           ServiceCBuilderModule.class,
-          NetworkModule.class
+          NetworkModule.class,
+          RepositoryModule.class,
+          UtilModule.class,
+          WarrantyNotificationWorker_HiltModule.class,
+          WorkerModule.class
       }
   )
   @Singleton
@@ -153,6 +167,8 @@ public final class KeeprApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AddEditApplianceViewModel_HiltModules.KeyModule.class,
+          ApplianceDetailViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
           HomeViewModel_HiltModules.KeyModule.class,
@@ -193,6 +209,8 @@ public final class KeeprApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AddEditApplianceViewModel_HiltModules.BindsModule.class,
+          ApplianceDetailViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           HomeViewModel_HiltModules.BindsModule.class
       }

@@ -6,8 +6,23 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
+import androidx.work.WorkManager;
+import com.keepr.app.data.local.KeeprDatabase;
+import com.keepr.app.data.local.dao.ApplianceDao;
+import com.keepr.app.data.repository.ApplianceRepository;
+import com.keepr.app.di.DatabaseModule_ProvideApplianceDaoFactory;
+import com.keepr.app.di.DatabaseModule_ProvideDatabaseFactory;
+import com.keepr.app.di.RepositoryModule_ProvideApplianceRepositoryFactory;
+import com.keepr.app.di.UtilModule_ProvideImageManagerFactory;
+import com.keepr.app.di.WorkerModule_ProvideWorkManagerFactory;
+import com.keepr.app.ui.screens.add.AddEditApplianceViewModel;
+import com.keepr.app.ui.screens.add.AddEditApplianceViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.keepr.app.ui.screens.detail.ApplianceDetailViewModel;
+import com.keepr.app.ui.screens.detail.ApplianceDetailViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.keepr.app.ui.screens.home.HomeViewModel;
 import com.keepr.app.ui.screens.home.HomeViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.keepr.app.util.ImageManager;
+import com.keepr.app.util.NotificationScheduler;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -22,10 +37,13 @@ import dagger.hilt.android.internal.lifecycle.DefaultViewModelFactories_Internal
 import dagger.hilt.android.internal.managers.ActivityRetainedComponentManager_LifecycleModule_ProvideActivityRetainedLifecycleFactory;
 import dagger.hilt.android.internal.managers.SavedStateHandleHolder;
 import dagger.hilt.android.internal.modules.ApplicationContextModule;
+import dagger.hilt.android.internal.modules.ApplicationContextModule_ProvideContextFactory;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.DoubleCheck;
+import dagger.internal.MapBuilder;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
+import dagger.internal.SetBuilder;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -50,25 +68,20 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
     return new Builder();
   }
 
-  public static KeeprApplication_HiltComponents.SingletonC create() {
-    return new Builder().build();
-  }
-
   public static final class Builder {
+    private ApplicationContextModule applicationContextModule;
+
     private Builder() {
     }
 
-    /**
-     * @deprecated This module is declared, but an instance is not used in the component. This method is a no-op. For more, see https://dagger.dev/unused-modules.
-     */
-    @Deprecated
     public Builder applicationContextModule(ApplicationContextModule applicationContextModule) {
-      Preconditions.checkNotNull(applicationContextModule);
+      this.applicationContextModule = Preconditions.checkNotNull(applicationContextModule);
       return this;
     }
 
     public KeeprApplication_HiltComponents.SingletonC build() {
-      return new SingletonCImpl();
+      Preconditions.checkBuilderRequirement(applicationContextModule, ApplicationContextModule.class);
+      return new SingletonCImpl(applicationContextModule);
     }
   }
 
@@ -367,7 +380,7 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return Collections.<String>singleton(HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide());
+      return SetBuilder.<String>newSetBuilder(3).add(AddEditApplianceViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ApplianceDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(HomeViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
     }
 
     @Override
@@ -393,6 +406,10 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
 
     private final ViewModelCImpl viewModelCImpl = this;
 
+    private Provider<AddEditApplianceViewModel> addEditApplianceViewModelProvider;
+
+    private Provider<ApplianceDetailViewModel> applianceDetailViewModelProvider;
+
     private Provider<HomeViewModel> homeViewModelProvider;
 
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
@@ -408,12 +425,14 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
     @SuppressWarnings("unchecked")
     private void initialize(final SavedStateHandle savedStateHandleParam,
         final ViewModelLifecycle viewModelLifecycleParam) {
-      this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
+      this.addEditApplianceViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
+      this.applianceDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
+      this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return Collections.<String, javax.inject.Provider<ViewModel>>singletonMap("com.keepr.app.ui.screens.home.HomeViewModel", ((Provider) homeViewModelProvider));
+      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(3).put("com.keepr.app.ui.screens.add.AddEditApplianceViewModel", ((Provider) addEditApplianceViewModelProvider)).put("com.keepr.app.ui.screens.detail.ApplianceDetailViewModel", ((Provider) applianceDetailViewModelProvider)).put("com.keepr.app.ui.screens.home.HomeViewModel", ((Provider) homeViewModelProvider)).build();
     }
 
     @Override
@@ -442,8 +461,14 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
       @Override
       public T get() {
         switch (id) {
-          case 0: // com.keepr.app.ui.screens.home.HomeViewModel 
-          return (T) new HomeViewModel();
+          case 0: // com.keepr.app.ui.screens.add.AddEditApplianceViewModel 
+          return (T) new AddEditApplianceViewModel(singletonCImpl.provideApplianceRepositoryProvider.get(), singletonCImpl.provideImageManagerProvider.get(), singletonCImpl.notificationSchedulerProvider.get());
+
+          case 1: // com.keepr.app.ui.screens.detail.ApplianceDetailViewModel 
+          return (T) new ApplianceDetailViewModel(singletonCImpl.provideApplianceRepositoryProvider.get(), singletonCImpl.provideImageManagerProvider.get());
+
+          case 2: // com.keepr.app.ui.screens.home.HomeViewModel 
+          return (T) new HomeViewModel(singletonCImpl.provideApplianceRepositoryProvider.get(), singletonCImpl.notificationSchedulerProvider.get());
 
           default: throw new AssertionError(id);
         }
@@ -521,11 +546,36 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
   }
 
   private static final class SingletonCImpl extends KeeprApplication_HiltComponents.SingletonC {
+    private final ApplicationContextModule applicationContextModule;
+
     private final SingletonCImpl singletonCImpl = this;
 
-    private SingletonCImpl() {
+    private Provider<KeeprDatabase> provideDatabaseProvider;
 
+    private Provider<ApplianceDao> provideApplianceDaoProvider;
 
+    private Provider<ImageManager> provideImageManagerProvider;
+
+    private Provider<ApplianceRepository> provideApplianceRepositoryProvider;
+
+    private Provider<WorkManager> provideWorkManagerProvider;
+
+    private Provider<NotificationScheduler> notificationSchedulerProvider;
+
+    private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
+      this.applicationContextModule = applicationContextModuleParam;
+      initialize(applicationContextModuleParam);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initialize(final ApplicationContextModule applicationContextModuleParam) {
+      this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<KeeprDatabase>(singletonCImpl, 2));
+      this.provideApplianceDaoProvider = DoubleCheck.provider(new SwitchingProvider<ApplianceDao>(singletonCImpl, 1));
+      this.provideImageManagerProvider = DoubleCheck.provider(new SwitchingProvider<ImageManager>(singletonCImpl, 3));
+      this.provideApplianceRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<ApplianceRepository>(singletonCImpl, 0));
+      this.provideWorkManagerProvider = DoubleCheck.provider(new SwitchingProvider<WorkManager>(singletonCImpl, 5));
+      this.notificationSchedulerProvider = DoubleCheck.provider(new SwitchingProvider<NotificationScheduler>(singletonCImpl, 4));
     }
 
     @Override
@@ -545,6 +595,43 @@ public final class DaggerKeeprApplication_HiltComponents_SingletonC {
     @Override
     public ServiceComponentBuilder serviceComponentBuilder() {
       return new ServiceCBuilder(singletonCImpl);
+    }
+
+    private static final class SwitchingProvider<T> implements Provider<T> {
+      private final SingletonCImpl singletonCImpl;
+
+      private final int id;
+
+      SwitchingProvider(SingletonCImpl singletonCImpl, int id) {
+        this.singletonCImpl = singletonCImpl;
+        this.id = id;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public T get() {
+        switch (id) {
+          case 0: // com.keepr.app.data.repository.ApplianceRepository 
+          return (T) RepositoryModule_ProvideApplianceRepositoryFactory.provideApplianceRepository(singletonCImpl.provideApplianceDaoProvider.get(), singletonCImpl.provideImageManagerProvider.get());
+
+          case 1: // com.keepr.app.data.local.dao.ApplianceDao 
+          return (T) DatabaseModule_ProvideApplianceDaoFactory.provideApplianceDao(singletonCImpl.provideDatabaseProvider.get());
+
+          case 2: // com.keepr.app.data.local.KeeprDatabase 
+          return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 3: // com.keepr.app.util.ImageManager 
+          return (T) UtilModule_ProvideImageManagerFactory.provideImageManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 4: // com.keepr.app.util.NotificationScheduler 
+          return (T) new NotificationScheduler(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideWorkManagerProvider.get());
+
+          case 5: // androidx.work.WorkManager 
+          return (T) WorkerModule_ProvideWorkManagerFactory.provideWorkManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          default: throw new AssertionError(id);
+        }
+      }
     }
   }
 }

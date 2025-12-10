@@ -17,11 +17,21 @@ import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_andro
 import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_android_internal_builders_ViewModelComponentBuilder;
 import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_android_internal_builders_ViewWithFragmentComponentBuilder;
 import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_components_SingletonComponent;
+import hilt_aggregated_deps._androidx_hilt_work_HiltWrapper_WorkerFactoryModule;
 import hilt_aggregated_deps._com_keepr_app_KeeprApplication_GeneratedInjector;
 import hilt_aggregated_deps._com_keepr_app_MainActivity_GeneratedInjector;
+import hilt_aggregated_deps._com_keepr_app_di_DatabaseModule;
 import hilt_aggregated_deps._com_keepr_app_di_NetworkModule;
+import hilt_aggregated_deps._com_keepr_app_di_RepositoryModule;
+import hilt_aggregated_deps._com_keepr_app_di_UtilModule;
+import hilt_aggregated_deps._com_keepr_app_di_WorkerModule;
+import hilt_aggregated_deps._com_keepr_app_ui_screens_add_AddEditApplianceViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_keepr_app_ui_screens_add_AddEditApplianceViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_keepr_app_ui_screens_detail_ApplianceDetailViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_keepr_app_ui_screens_detail_ApplianceDetailViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_keepr_app_ui_screens_home_HomeViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_keepr_app_ui_screens_home_HomeViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_keepr_app_worker_WarrantyNotificationWorker_HiltModule;
 import hilt_aggregated_deps._dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint;
 import hilt_aggregated_deps._dagger_hilt_android_flags_HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule;
 import hilt_aggregated_deps._dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint;
@@ -62,11 +72,21 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _dagger_hilt_components_SingletonComponent.class
     },
     aggregatedDeps = {
+        _androidx_hilt_work_HiltWrapper_WorkerFactoryModule.class,
         _com_keepr_app_KeeprApplication_GeneratedInjector.class,
         _com_keepr_app_MainActivity_GeneratedInjector.class,
+        _com_keepr_app_di_DatabaseModule.class,
         _com_keepr_app_di_NetworkModule.class,
+        _com_keepr_app_di_RepositoryModule.class,
+        _com_keepr_app_di_UtilModule.class,
+        _com_keepr_app_di_WorkerModule.class,
+        _com_keepr_app_ui_screens_add_AddEditApplianceViewModel_HiltModules_BindsModule.class,
+        _com_keepr_app_ui_screens_add_AddEditApplianceViewModel_HiltModules_KeyModule.class,
+        _com_keepr_app_ui_screens_detail_ApplianceDetailViewModel_HiltModules_BindsModule.class,
+        _com_keepr_app_ui_screens_detail_ApplianceDetailViewModel_HiltModules_KeyModule.class,
         _com_keepr_app_ui_screens_home_HomeViewModel_HiltModules_BindsModule.class,
         _com_keepr_app_ui_screens_home_HomeViewModel_HiltModules_KeyModule.class,
+        _com_keepr_app_worker_WarrantyNotificationWorker_HiltModule.class,
         _dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint.class,
         _dagger_hilt_android_flags_HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
         _dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint.class,

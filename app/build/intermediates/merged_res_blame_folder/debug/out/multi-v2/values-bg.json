@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.keepr.app-mergeDebugResources-58:/values-bg/values-bg.xml",
+            "outputFile": "com.keepr.app-mergeDebugResources-64:/values-bg/values-bg.xml",
             "map": [
                 {
                     "source": "/Users/amalgupta/.gradle/caches/transforms-3/6f8ea0aaf174f9bccc1b9be3a1b1fa37/transformed/jetified-foundation-release/res/values-bg/values-bg.xml",
